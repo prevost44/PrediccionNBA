@@ -52,7 +52,6 @@ def home(request):
 def predecir(request):
     if request.method == "POST":
         try:
-            # ✅ Obtener valores principales
             edad = int(request.POST.get("Age"))
             posicion = int(request.POST.get("Pos"))
             juegos = int(request.POST.get("G"))
