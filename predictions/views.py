@@ -23,7 +23,7 @@ def completarCamposModelo(entrada):
     entrada["2P%"] = round((entrada["2P"] / entrada["2PA"]) * 100 if entrada["2PA"] > 0 else 0, 1)
     entrada["3P%"] = round((entrada["3P"] / entrada["3PA"]) * 100 if entrada["3PA"] > 0 else 0, 1)
     entrada["FT%"] = round((entrada["FT"] / entrada["FTA"]) * 100 if entrada["FTA"] > 0 else 0, 1)
-    entrada["TRB"] = entrada["ORB"] + entrada["DRB"]
+    entrada["TRB"]  = round(float(entrada["ORB"] + entrada["DRB"]), 2)
     entrada["eFG%"] = round(((entrada["2P"] + 0.5 * entrada["3P"]) / entrada["FGA"]) * 100 if entrada["FGA"] > 0 else 0, 1)
     return entrada
 
