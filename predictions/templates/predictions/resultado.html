@@ -1,0 +1,219 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>📊 Resultados de Predicción</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Fuentes & Iconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Anton&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Tu CSS -->
+  <link href="{% static 'css/resultado.css' %}" rel="stylesheet">
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <!-- Header tipo marcador -->
+  <div class="scoreboard-wrap">
+    <div class="container">
+      <div class="scoreboard">
+        <h1>📊 Resultados de Predicción</h1>
+        <p class="muted">Desempeño estimado y comparación por décadas</p>
+      </div>
+    </div>
+  </div>
+
+  <main class="container py-4 py-md-5">
+    <!-- ===== Estadísticas matemáticas ===== -->
+    <section class="glass p-4 p-md-5 mb-4">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <span class="glass-title"><i class="bi bi-calculator me-2"></i>Estadísticas Meramente Matemáticas</span>
+        <div class="divider"></div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Col izquierda: Contadores -->
+        <div class="col-lg-6">
+          <div class="d-grid gap-2">
+            <div class="stat-chip">
+              <i class="bi bi-basket2-fill"></i>
+              PTS:
+              <strong class="ms-1 countup" data-value="{{ puntosCalculados|default:'0' }}">0</strong>
+            </div>
+
+            <div class="stat-chip">
+              <i class="bi bi-bullseye"></i>
+              AST:
+              <strong class="ms-1 countup" data-value="{{ statsUsuario.AST|default:'0' }}">0</strong>
+            </div>
+
+            <div class="stat-chip">
+              <i class="bi bi-shield-fill-check"></i>
+              REB:
+              <strong class="ms-1 countup" data-value="{{ statsUsuario.ORB|add:statsUsuario.DRB|default:'0' }}">0</strong>
+            </div>
+
+            <div class="stat-chip">
+              <i class="bi bi-eye-fill"></i>
+              STL:
+              <strong class="ms-1 countup" data-value="{{ statsUsuario.STL|default:'0' }}">0</strong>
+            </div>
+
+            <div class="stat-chip">
+              <i class="bi bi-slash-circle"></i>
+              BLK:
+              <strong class="ms-1 countup" data-value="{{ statsUsuario.BLK|default:'0' }}">0</strong>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-1">
+              <span class="badge-flag no">
+                <i class="bi bi-x-octagon"></i>
+                TOV: <span class="countup ms-1" data-value="{{ statsUsuario.TOV|default:'0' }}">0</span>
+              </span>
+              <span class="badge-flag no">
+                <i class="bi bi-ban"></i>
+                PF: <span class="countup ms-1" data-value="{{ statsUsuario.PF|default:'0' }}">0</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col derecha: Porcentajes con barras -->
+        <div class="col-lg-6">
+          <div class="d-grid gap-3">
+            <div>
+              <div class="label-mini">FG% <span class="countup" data-value="{{ porcentajes.FGP|default:'0' }}">0</span>%</div>
+              <div class="meter"><span style="width: {{ porcentajes.FGP|default:'0' }}%"></span></div>
+            </div>
+            <div>
+              <div class="label-mini">2P% <span class="countup" data-value="{{ porcentajes.P2P|default:'0' }}">0</span>%</div>
+              <div class="meter"><span style="width: {{ porcentajes.P2P|default:'0' }}%"></span></div>
+            </div>
+            <div>
+              <div class="label-mini">3P% <span class="countup" data-value="{{ porcentajes.P3P|default:'0' }}">0</span>%</div>
+              <div class="meter"><span style="width: {{ porcentajes.P3P|default:'0' }}%"></span></div>
+            </div>
+            <div>
+              <div class="label-mini">TL% <span class="countup" data-value="{{ porcentajes.FTP|default:'0' }}">0</span>%</div>
+              <div class="meter"><span style="width: {{ porcentajes.FTP|default:'0' }}%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Resultados por década ===== -->
+    <section class="mb-4">
+      <div class="row g-3">
+        {% for decada, valores in resultados.items %}
+          {% if decada == "2020" %}
+            <!-- Destacado -->
+            <div class="col-12">
+              <div class="decade-card feature p-4">
+                <div class="decade-title">
+                  <i class="bi bi-trophy-fill text-warning"></i>
+                  Década de los {{ decada }}
+                </div>
+                <div class="ppg-big">
+                  PPG:
+                  <span class="countup" data-value="{{ valores.PuntosPorPartido|floatformat:2|default:'0' }}">0</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <span class="badge-flag {% if valores.AllStar == 1 %}yes{% else %}no{% endif %}">
+                    <i class="bi bi-stars"></i> All-Star:
+                    {% if valores.AllStar == 1 %}Sí{% else %}No{% endif %}
+                  </span>
+                  <span class="badge-flag {% if valores.AllNBA == 1 %}yes{% else %}no{% endif %}">
+                    <i class="bi bi-award-fill"></i> All-NBA:
+                    {% if valores.AllNBA == 1 %}Sí{% else %}No{% endif %}
+                  </span>
+                  <span class="badge-flag {% if valores.MVPTop5 == 1 %}yes{% else %}no{% endif %}">
+                    <i class="bi bi-graph-up-arrow"></i> MVP Top-5:
+                    {% if valores.MVPTop5 == 1 %}Sí{% else %}No{% endif %}
+                  </span>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <!-- Normal -->
+            <div class="col-md-6">
+              <div class="decade-card p-4">
+                <div class="decade-title">
+                  <i class="bi bi-flag-fill text-info"></i>
+                  Década de los {{ decada }}
+                </div>
+                <div class="ppg-big">
+                  PPG:
+                  <span class="countup" data-value="{{ valores.PuntosPorPartido|floatformat:2|default:'0' }}">0</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="badge-flag {% if valores.AllStar == 1 %}yes{% else %}no{% endif %}">
+                    <i class="bi bi-stars"></i> All-Star:
+                    {% if valores.AllStar == 1 %}Sí{% else %}No{% endif %}
+                  </span>
+                  <span class="badge-flag {% if valores.AllNBA == 1 %}yes{% else %}no{% endif %}">
+                    <i class="bi bi-award-fill"></i> All-NBA:
+                    {% if valores.AllNBA == 1 %}Sí{% else %}No{% endif %}
+                  </span>
+                  <span class="badge-flag {% if valores.MVPTop5 == 1 %}yes{% else %}no{% endif %}">
+                    <i class="bi bi-graph-up-arrow"></i> MVP Top-5:
+                    {% if valores.MVPTop5 == 1 %}Sí{% else %}No{% endif %}
+                  </span>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Botón de volver -->
+    <div class="text-center mt-4">
+      <a href="{% url 'inicio' %}" class="btn btn-volver">
+        <i class="bi bi-arrow-left-circle me-2"></i>Volver al inicio
+      </a>
+    </div>
+  </main>
+
+  <!-- Animaciones suaves -->
+  <script>
+    // Barras de porcentaje
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.meter > span').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0%';
+        requestAnimationFrame(() => { bar.style.width = w || '0%'; });
+      });
+    });
+
+    // CountUp básico (sin librerías)
+    function animateCount(el, to, duration=900){
+      const isFloat = String(to).includes('.');
+      const target = parseFloat(to) || 0;
+      const start = 0;
+      const startTime = performance.now();
+      const decimals = isFloat ? 2 : 0;
+
+      function frame(now){
+        const p = Math.min(1, (now - startTime) / duration);
+        const val = start + (target - start) * p;
+        el.textContent = val.toFixed(decimals);
+        if(p < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.countup').forEach(el => {
+        const v = el.getAttribute('data-value') ?? '0';
+        animateCount(el, v, 1000);
+      });
+    });
+  </script>
+</body>
+</html>
