@@ -55,7 +55,13 @@
             <div class="stat-chip">
               <i class="bi bi-shield-fill-check"></i>
               REB:
-              <strong class="ms-1 countup" data-value="{{ statsUsuario.ORB|add:statsUsuario.DRB|default:'0' }}">0</strong>
+              <strong
+                class="ms-1 countup"
+                data-orb="{{ statsUsuario.ORB|default:'0' }}"
+                data-drb="{{ statsUsuario.DRB|default:'0' }}"
+                data-decimals="2"
+                data-value="__sum__"
+              >0</strong>
             </div>
 
             <div class="stat-chip">
@@ -182,38 +188,49 @@
 
   <!-- Animaciones suaves -->
   <script>
-    // Barras de porcentaje
-    window.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.meter > span').forEach(bar => {
-        const w = bar.style.width;
-        bar.style.width = '0%';
-        requestAnimationFrame(() => { bar.style.width = w || '0%'; });
-      });
+  // Barras de porcentaje (igual que ya tienes)
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.meter > span').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0%';
+      requestAnimationFrame(() => { bar.style.width = w || '0%'; });
     });
+  });
 
-    // CountUp básico (sin librerías)
-    function animateCount(el, to, duration=900){
-      const isFloat = String(to).includes('.');
-      const target = parseFloat(to) || 0;
-      const start = 0;
-      const startTime = performance.now();
-      const decimals = isFloat ? 2 : 0;
+  // CountUp básico (con soporte de data-decimals)
+  function animateCount(el, to, duration=900){
+    const forcedDecimalsAttr = el.getAttribute('data-decimals');
+    const forcedDecimals = forcedDecimalsAttr != null ? parseInt(forcedDecimalsAttr, 10) : null;
+    const isFloat = String(to).includes('.');
+    const decimals = (forcedDecimals !== null && !isNaN(forcedDecimals)) ? forcedDecimals : (isFloat ? 2 : 0);
 
-      function frame(now){
-        const p = Math.min(1, (now - startTime) / duration);
-        const val = start + (target - start) * p;
-        el.textContent = val.toFixed(decimals);
-        if(p < 1) requestAnimationFrame(frame);
-      }
-      requestAnimationFrame(frame);
+    const target = parseFloat(to) || 0;
+    const start = 0;
+    const startTime = performance.now();
+
+    function frame(now){
+      const p = Math.min(1, (now - startTime) / duration);
+      const val = start + (target - start) * p;
+      el.textContent = val.toFixed(decimals);
+      if (p < 1) requestAnimationFrame(frame);
     }
+    requestAnimationFrame(frame);
+  }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.countup').forEach(el => {
-        const v = el.getAttribute('data-value') ?? '0';
-        animateCount(el, v, 1000);
-      });
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.countup').forEach(el => {
+      let v = el.getAttribute('data-value') ?? '0';
+
+      if (v === '__sum__') {
+        const orb = parseFloat(el.getAttribute('data-orb') || '0');
+        const drb = parseFloat(el.getAttribute('data-drb') || '0');
+        v = (orb + drb).toString();
+      }
+
+      animateCount(el, v, 1000);
     });
-  </script>
+  });
+</script>
+
 </body>
 </html>
